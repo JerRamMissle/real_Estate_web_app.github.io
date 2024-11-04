@@ -5,7 +5,7 @@ import { Flex, Box, Text, Icon } from "@chakra-ui/react";
 import { BsFilter } from "react-icons/bs";
 
 import Property from "../components/Property";
-import SearchFilters from "../components/SearchFilters";
+import SearchFilters from "../components/SearchFilter";
 import { baseUrl, fetchApi } from "../utils/fetchApi";
 import noresult from "../assets/images/noresult.svg";
 
@@ -28,7 +28,7 @@ const Search = ({ properties }) => {
         alignItems="center"
       >
         <Text>Search Property By Filters</Text>
-        <Icon paddingLeft="2" w="7" as={BsFilter} />
+        <Icon paddingleft="2" w="7" as={BsFilter} />
       </Flex>
       {searchFilters && <SearchFilters />}
       <Text fontSize="2xl" p="4" fontWeight="bold">
@@ -47,7 +47,12 @@ const Search = ({ properties }) => {
           marginTop="5"
           marginBottom="5"
         >
-          <Image src={noresult} />
+          <Image
+            src={noresult}
+            alt="No results found"
+            width={200}
+            height={200}
+          />
           <Text fontSize="xl" marginTop="3">
             No Result Found.
           </Text>
