@@ -1,4 +1,3 @@
-// pages/_document.js
 import Document, { Html, Head, Main, NextScript } from "next/document";
 
 class MyDocument extends Document {
@@ -6,7 +5,6 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
-          {/* Move the nprogress stylesheet link here */}
           <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css"
