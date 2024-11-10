@@ -1,14 +1,20 @@
 import { useEffect } from "react";
 import Router from "next/router";
 import NProgress from "nprogress";
-import { ChakraProvider } from "@chakra-ui/react";
-
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import Layout from "../components/Layout";
+import "../styles/globals.css";
+
+// Custom Chakra UI theme (optional)
+const customTheme = extendTheme({
+  initialColorMode: "light",
+  useSystemColorMode: true,
+});
 
 function MyApp({ Component, pageProps }) {
-  NProgress.configure({ showSpinner: false });
-
   useEffect(() => {
+    NProgress.configure({ showSpinner: false });
+
     const handleRouteChangeStart = () => NProgress.start();
     const handleRouteChangeEnd = () => NProgress.done();
 
@@ -25,7 +31,7 @@ function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={customTheme}>
       <Layout>
         <Component {...pageProps} />
       </Layout>

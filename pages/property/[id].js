@@ -99,7 +99,7 @@ const PropertyDetails = ({
     <Box>
       {amenities.length && (
         <Text fontSize="2xl" fontWeight="black" marginTop="5">
-          Facilites:
+          Facilities:
         </Text>
       )}
       <Flex flexWrap="wrap">
@@ -124,14 +124,33 @@ const PropertyDetails = ({
   </Box>
 );
 
-export default PropertyDetails;
-
-export async function getServerSideProps({ params: { id } }) {
+export async function getStaticProps({ params: { id } }) {
   const data = await fetchApi(`${baseUrl}/properties/detail?externalID=${id}`);
 
   return {
     props: {
       propertyDetails: data,
     },
+    revalidate: 10, // Optional: Incremental Static Regeneration (ISR)
   };
 }
+
+// `getStaticPaths` for dynamic routes, used with `getStaticProps`
+export async function getStaticPaths() {
+  // Fetch a list of property IDs to pre-render pages at build time
+  const properties = await fetchApi(
+    `${baseUrl}/properties/list?locationExternalIDs=5002&purpose=for-sale&hitsPerPage=10`
+  );
+
+  // Generate a list of paths (one for each property)
+  const paths = properties?.hits?.map((property) => ({
+    params: { id: property.id.toString() }, // You need to return the `id` as a string
+  }));
+
+  return {
+    paths: paths || [],
+    fallback: "blocking", // Optional: "blocking" or "false" for static generation
+  };
+}
+
+export default PropertyDetails;

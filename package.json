@@ -13,7 +13,9 @@
     "export": "next export"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.8.2",
+    "@chakra-ui/avatar": "^2.3.0",
+    "@chakra-ui/layout": "^2.3.1",
+    "@chakra-ui/react": "^2.10.4",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "axios": "^1.7.4",
