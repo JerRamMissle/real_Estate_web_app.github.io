@@ -8,4 +8,5 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// CommonJS export syntax
+module.exports = nextConfig;

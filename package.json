@@ -2,7 +2,7 @@
   "name": "real-estate-web-application",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://JerRamMissle.github.io//real-estate-web-application.github.io",
+  "homepage": "https://JerRamMissle.github.io/real_Estate_web_app.github.io",
   "scripts": {
     "dev": "next dev",
     "predeploy": "npm run build",
