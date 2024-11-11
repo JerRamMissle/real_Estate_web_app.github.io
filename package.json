@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d out",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -22,7 +22,7 @@
     "axios-retry": "^4.5.0",
     "framer-motion": "^11.3.29",
     "millify": "^6.1.0",
-    "next": "^15.0.3",
+    "next": "^13.5.3",
     "nprogress": "^0.2.0",
     "react": "^18",
     "react-dom": "^18",

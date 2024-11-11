@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { Flex, Box, Text, Icon } from "@chakra-ui/react";
@@ -7,11 +7,34 @@ import { BsFilter } from "react-icons/bs";
 import Property from "../components/Property";
 import SearchFilters from "../components/SearchFilter";
 import { baseUrl, fetchApi } from "../utils/fetchApi";
-import noresult from "../assets/images/noresult.svg";
 
-const Search = ({ properties }) => {
+const Search = ({ initialProperties }) => {
   const [searchFilters, setSearchFilters] = useState(false);
+  const [properties, setProperties] = useState(initialProperties || []);
   const router = useRouter();
+
+  // Fetch updated properties when the query changes
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const queryParams = router.query;
+      const url = `${baseUrl}/properties/list?locationExternalIDs=${
+        queryParams.locationExternalIDs || "5002"
+      }&purpose=${queryParams.purpose || "for-rent"}&categoryExternalID=${
+        queryParams.categoryExternalID || "4"
+      }&bathsMin=${queryParams.bathsMin || "0"}&rentFrequency=${
+        queryParams.rentFrequency || "yearly"
+      }&priceMin=${queryParams.minPrice || "0"}&priceMax=${
+        queryParams.maxPrice || "1000000"
+      }&roomsMin=${queryParams.roomsMin || "0"}&sort=${
+        queryParams.sort || "price-desc"
+      }&areaMax=${queryParams.areaMax || "35000"}`;
+
+      const data = await fetchApi(url);
+      setProperties(data?.hits || []);
+    };
+
+    fetchProperties();
+  }, [router.query]);
 
   return (
     <Box>
@@ -28,7 +51,7 @@ const Search = ({ properties }) => {
         alignItems="center"
       >
         <Text>Search Property By Filters</Text>
-        <Icon paddingleft="2" w="7" as={BsFilter} />
+        <Icon paddingLeft="2" w="7" as={BsFilter} />
       </Flex>
       {searchFilters && <SearchFilters />}
       <Text fontSize="2xl" p="4" fontWeight="bold">
@@ -48,7 +71,7 @@ const Search = ({ properties }) => {
           marginBottom="5"
         >
           <Image
-            src={noresult}
+            src="/images/noresult.svg" // Reference to public/images/noresult.svg
             alt="No results found"
             width={200}
             height={200}
@@ -62,26 +85,15 @@ const Search = ({ properties }) => {
   );
 };
 
-export async function getServerSideProps({ query }) {
-  const purpose = query.purpose || "for-rent";
-  const rentFrequency = query.rentFrequency || "yearly";
-  const minPrice = query.minPrice || "0";
-  const maxPrice = query.maxPrice || "1000000";
-  const roomsMin = query.roomsMin || "0";
-  const bathsMin = query.bathsMin || "0";
-  const sort = query.sort || "price-desc";
-  const areaMax = query.areaMax || "35000";
-  const locationExternalIDs = query.locationExternalIDs || "5002";
-  const categoryExternalID = query.categoryExternalID || "4";
-
-  const data = await fetchApi(
-    `${baseUrl}/properties/list?locationExternalIDs=${locationExternalIDs}&purpose=${purpose}&categoryExternalID=${categoryExternalID}&bathsMin=${bathsMin}&rentFrequency=${rentFrequency}&priceMin=${minPrice}&priceMax=${maxPrice}&roomsMin=${roomsMin}&sort=${sort}&areaMax=${areaMax}`
-  );
+export async function getStaticProps() {
+  const defaultQuery = `${baseUrl}/properties/list?locationExternalIDs=5002&purpose=for-rent&categoryExternalID=4&bathsMin=0&rentFrequency=yearly&priceMin=0&priceMax=1000000&roomsMin=0&sort=price-desc&areaMax=35000`;
+  const data = await fetchApi(defaultQuery);
 
   return {
     props: {
-      properties: data?.hits,
+      initialProperties: data?.hits || [],
     },
+    revalidate: 86400, // Revalidate daily (adjust frequency as needed)
   };
 }
 
