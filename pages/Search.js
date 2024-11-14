@@ -93,7 +93,6 @@ export async function getStaticProps() {
     props: {
       initialProperties: data?.hits || [],
     },
-    revalidate: 86400, // Revalidate daily (adjust frequency as needed)
   };
 }
 

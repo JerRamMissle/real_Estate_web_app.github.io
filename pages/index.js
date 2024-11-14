@@ -15,13 +15,7 @@ export const Banner = ({
   imageUrl,
 }) => (
   <Flex flexWrap="wrap" justifyContent="center" alignItems="center" m="10">
-    <Image
-      src={imageUrl}
-      width={500}
-      height={300}
-      alt={`${purpose} image`}
-      priority={purpose === "RENT A HOME"}
-    />
+    <Image src={imageUrl} width={500} height={300} alt={`${purpose} image`} />
     <Box p="5">
       <Text color="gray.500" fontSize="sm" fontWeight="medium">
         {purpose}
@@ -45,8 +39,10 @@ export const Banner = ({
   </Flex>
 );
 
-const Home = ({ propertiesForSale, propertiesForRent }) => (
+const Home = ({ propertiesForSale, propertiesForRent, error }) => (
   <Box>
+    {error && <Text color="red.500">{error}</Text>}
+
     <Banner
       purpose="RENT A HOME"
       title1="Rental Homes for"
@@ -58,10 +54,15 @@ const Home = ({ propertiesForSale, propertiesForRent }) => (
       imageUrl="https://bayut-production.s3.eu-central-1.amazonaws.com/image/145426814/33973352624c48628e41f2ec460faba4"
     />
     <Flex flexWrap="wrap">
-      {propertiesForRent.map((property) => (
-        <Property property={property} key={property.id} />
-      ))}
+      {propertiesForRent.length > 0 ? (
+        propertiesForRent.map((property) => (
+          <Property property={property} key={property.id} />
+        ))
+      ) : (
+        <Text>No rental properties available.</Text>
+      )}
     </Flex>
+
     <Banner
       purpose="BUY A HOME"
       title1=" Find, Buy & Own Your"
@@ -73,15 +74,20 @@ const Home = ({ propertiesForSale, propertiesForRent }) => (
       imageUrl="https://bayut-production.s3.eu-central-1.amazonaws.com/image/110993385/6a070e8e1bae4f7d8c1429bc303d2008"
     />
     <Flex flexWrap="wrap">
-      {propertiesForSale.map((property) => (
-        <Property property={property} key={property.id} />
-      ))}
+      {propertiesForSale.length > 0 ? (
+        propertiesForSale.map((property) => (
+          <Property property={property} key={property.id} />
+        ))
+      ) : (
+        <Text>No properties available for sale.</Text>
+      )}
     </Flex>
   </Box>
 );
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   try {
+    // Fetch data dynamically on each request
     const propertyForSale = await fetchApi(
       `${baseUrl}/properties/list?locationExternalIDs=5002&purpose=for-sale&hitsPerPage=6`
     );
@@ -89,10 +95,25 @@ export async function getStaticProps() {
       `${baseUrl}/properties/list?locationExternalIDs=5002&purpose=for-rent&hitsPerPage=6`
     );
 
+    // Simplify the properties data to avoid large payloads
+    const simplifiedSaleProperties = propertyForSale?.hits?.map((property) => ({
+      id: property.id,
+      title: property.title,
+      price: property.price,
+      imageUrl: property.coverPhoto?.url, // Assuming the first photo is the cover photo
+    }));
+
+    const simplifiedRentProperties = propertyForRent?.hits?.map((property) => ({
+      id: property.id,
+      title: property.title,
+      price: property.price,
+      imageUrl: property.coverPhoto?.url, // Assuming the first photo is the cover photo
+    }));
+
     return {
       props: {
-        propertiesForSale: propertyForSale?.hits || [],
-        propertiesForRent: propertyForRent?.hits || [],
+        propertiesForSale: simplifiedSaleProperties || [],
+        propertiesForRent: simplifiedRentProperties || [],
       },
     };
   } catch (error) {
@@ -101,6 +122,7 @@ export async function getStaticProps() {
       props: {
         propertiesForSale: [],
         propertiesForRent: [],
+        error: "Failed to fetch properties. Please try again later.",
       },
     };
   }
