@@ -1,6 +1,0 @@
-<Image
-  src="/images/noresult.svg"
-  alt="No results found"
-  width={200}
-  height={200}
-/>
